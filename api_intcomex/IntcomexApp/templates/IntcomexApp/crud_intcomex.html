@@ -1,0 +1,74 @@
+{% extends "ProyectoApp/home.html" %}
+
+{% load static %}
+
+{% block content %}
+{% block fragment1 %}
+{{ view.insertardatos}}
+{% endblock fragment1 %}
+
+
+<!--<body style="background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSI8FMmomqULGmWwsyHMfrN-LE6C0CJ3vskz--k426o9Eumni-K5nab4pKLUYpRxzrZpwc&usqp=CAU');">-->
+    <form action="}" method="POST">
+  
+    {% csrf_token %}
+    <a href="{% url 'agregar' %}">
+        <button type="button" class="btn btn-primary">Add</button>
+
+    </a>
+    <a href="{% url 'actualizar' %}">
+    <button type="button" class="btn btn-warning">Update</button>
+    </a>
+    <a href="{% url 'agregar_imagen' %}">
+        <button type="button" class="btn btn-info">Add image</button>
+    </a>
+    <a href="{% url 'imagen_mpn' %}">
+        <button type="button" class="btn btn-outline-primary">Add image mpn</button>
+    </a>
+    <a href="{% url 'imagen_upc' %}">
+        <button type="button" class="btn btn-outline-secondary">Add image upc</button>
+    </a>
+    </a>
+    <a href="{% url 'actualizar_imagen_mpn' %}">
+        <button type="button" class="btn btn-outline-success">Update image mpn</button>
+    </a>
+    <a href="{% url 'actualizar_upc' %}">
+        <button type="button" class="btn btn-outline-danger">Update upc</button>
+    </a>
+    <a href="{% url 'actualizar_imagen' %}">
+        <button type="button" class="btn btn-outline-warning">Update image</button>
+    </a>
+    <a href="{% url 'agregar_j' %}">
+        <button type="button" class="btn btn-success">Add Jumpseller</button>
+    </a>
+    <a href="{% url 'actualiza_jumpseller' %}">
+        <button type="button" class="btn btn-danger">Update Jumpseller</button>
+    </a>
+    <a href="{% url 'agregar_id' %}">
+        <button type="button" class="btn btn-secondary">Get id</button>
+    </a>
+    <a href="{% url 'enviar_imagen' %}">
+        <button type="button" class="btn btn-light">Send image</button>
+    </a>
+    <br>
+    <br>
+    <div>
+    <input type="text" name="orden"/>
+    <a href="{% url 'enviar_ordenes' %}">
+        <button type="button" class="btn btn-dark">Send</button>
+    </a>
+    <a href="{% url 'recuperar_orden' %}">
+        <button type="button" class="btn btn-outline-success">get order</button>
+    </a>
+    <button type="button" class="btn btn-outline-info">order status</button>
+    <button type="button" class="btn btn-outline-danger">cancel order</button>
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends  'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block main %}
+<h1  class="text-center">Login</h1>
+<div style="background-color: #EAF2F8;" class="card">
+<div class="card-body">
+<h4 class="card-title">Log in to your account</h4>
+
+<form method="post">
+{% csrf_token %}
+<input type="hidden" name="next" value="{{ next }}">
+
+{{ form|crispy }}
+<a style="color: #1C2833;"  href="../password-reset">Forgot Password?</a>
+<button style="background-color: #25659D;" type="submit" class="btn btn-primary btn-block">Log in</button>
+</form>
+</div>
+</div>
+{% endblock %}

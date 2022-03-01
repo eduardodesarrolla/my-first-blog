@@ -1,0 +1,48 @@
+{% extends "ProyectoApp/home.html" %}
+
+{% load static %}
+
+{% block content %}
+{% block fragment1 %}
+{{ view.insertardatos}}
+{% endblock fragment1 %}
+
+<table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th width="35%">Sku</th>
+        <th>Descripcion</th>
+        <th>Categoria</th>
+        <th>Marca</th>
+        <th>Mpn</th>
+        <th>Upc</th>
+        <th>Peso</th>
+        <th>Ancho</th>
+        <th>Altura</th>
+        <th>Largo</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+    <!-- Recorremos los objetos o registros que tenemos en nuestra tabla 'postres' y los listamos -->
+    {% for Productos in Producto %}
+      <tr>
+       
+   
+          <!-- Usaremos un formulario que realizará la tarea de eliminar un registro o postre desde la misma tabla HTML -->                        
+          <form method="POST" action="">
+            {% csrf_token %}
+            <div class="btn-group">
+   
+              <!-- Creamos 3 botones que son ver, Editar y Eliminar, nos sirven para gestionar nuestros registros o postres -->
+             
+            </div>
+          </form>
+   
+        </td>
+      </tr>
+    
+   
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "ProyectoApp/home.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<form  action="" method="POST" enctype="multipart/form-data" required="True">
+    {% csrf_token %}
+    <input type="file" name="file2">
+    <p></p>
+    <Input Type = "Submit" class="btn btn-outline-danger" value = "Upload archive factura">
+      <br>
+      {% if messages %}
+      <ul class="messages">
+          {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+          {% endif %}
+      </ul>
+    </div>
+    </form>
+ 
+
+
+  {% endblock %}
