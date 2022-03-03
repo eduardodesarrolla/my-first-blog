@@ -48,6 +48,10 @@
                                 <div class="sb-nav-link-icon"><i class="far fa-plus-square"></i></div>
                                 Add
                             </a>
+                            <a class="nav-link" {% if request.path  == '/' %} active{% endif %} href="{% url 'listar_producto' %}">
+                                <div class="sb-nav-link-icon"><i class="far fa-plus-square"></i></div>
+                                Update
+                            </a>
                            
                             <div class="sb-sidenav-menu-heading">Informe HP</div>
                             <a class="nav-link" {% if request.path  == '/' %} active{% endif %} href="{% url 'importar' %}">
@@ -120,22 +124,12 @@
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item active">Proyecto Incotmex</li>
                         </ol>
+                       
                         {% block content %}
 
                         {% endblock %}
                 </main>
-                <footer class="py-4 bg-light mt-auto">
-                    <div class="container-fluid px-4">
-                        <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Your Website 2021</div>
-                            <div>
-                                <a href="#">Privacy Policy</a>
-                                &middot;
-                                <a href="#">Terms &amp; Conditions</a>
-                            </div>
-                        </div>
-                    </div>
-                </footer>
+                
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
@@ -145,5 +139,17 @@
         <script src="{% static 'ProyectoApp/assets/demo/chart-bar-demo.js' %}"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
         <script src="{% static 'ProyectoApp/js/datatables-simple-demo.js' %}"></script>
+        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        {% if messages %}
+            {% for m in messages %}
+                <script>
+                    Swal.fire({
+                        "title":"Mensaje",
+                        "text":"{{m}}",
+                        "icon":"succes"
+                    })
+                </script>
+            {% endfor %}
+        {% endif %}
     </body>
 </html>

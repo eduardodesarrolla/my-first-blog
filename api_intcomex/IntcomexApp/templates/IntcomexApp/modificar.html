@@ -1,0 +1,29 @@
+{% extends "ProyectoApp/home.html" %}
+
+{% load static %}
+
+{% block content %}
+{% block fragment1 %}
+{% endblock fragment1 %}
+{% load crispy_forms_tags %}
+
+<div class="card">
+  <div class="card-body">
+    <h2> Editar productos</h2>
+    <hr>
+
+    
+        <form action="" method='POST' enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form | crispy }}
+          <div class="d-flex justify-content-end">
+            <input type="reset" value="cancelar" class="btn btn-secondary">
+            &nbsp;
+            <input type="submit" value="Editar" class="btn btn-primary">
+        </form>
+        {{mensaje}}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

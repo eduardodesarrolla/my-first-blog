@@ -20,5 +20,7 @@ urlpatterns = [
     path('actualizar_upc/', views.actualizar_upc, name="actualizar_upc"),
     path('actualizar_imagen/', views.actualizar_imagen, name="actualizar_imagen"),
     path('exportar_errores/', views.exportar_errores, name="exportar_errores"),
-   
+    path('listar_producto/', views.listar_producto, name="listar_producto"),
+    path('modificar_producto/<sku>/', views.modificar_producto, name="modificar_producto"),
+    path('sin_imagen/', views.sin_imagen, name="sin_imagen"),
 ]

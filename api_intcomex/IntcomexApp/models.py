@@ -9,7 +9,7 @@ class producto(models.Model):
     precio = models.IntegerField()
     marca = models.CharField(max_length=250)
     mpn = models.CharField(max_length=250)
-    upc = models.CharField(max_length=250)
+    upc = models.CharField(max_length=250, null=True)
     peso = models.IntegerField()
     ancho = models.IntegerField()
     altura = models.IntegerField()

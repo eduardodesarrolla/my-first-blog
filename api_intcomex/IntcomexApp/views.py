@@ -1,11 +1,16 @@
-from django.shortcuts import render
+from email import message
+from django.shortcuts import render, redirect, get_object_or_404
 from django.db import connection as conexion
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect
 from api_intcomex.settings import *
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from IntcomexApp.models import producto
+from IntcomexApp.forms import ProductoForm
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.http import Http404
 import hashlib
 from datetime import datetime
 import requests
@@ -34,7 +39,10 @@ response2= requests.get("http://api.cmfchile.cl/api-sbifv3/recursos_api/dolar?",
 dataJson2=response2.json
 #print(response.content)
 jsonToPython2 = json.loads(response2.content)
-valor_dolar=jsonToPython2['Dolares'][0]['Valor'].replace(",",".")
+try:
+    valor_dolar=jsonToPython2['Dolares'][0]['Valor'].replace(",",".")
+except KeyError:
+    valor_dolar="900.00"
 
 response3= requests.get("https://intcomex-prod.apigee.net/v1/downloadextendedcatalog?", params = {"apiKey":apikey,"utcTimeStamp":hora_actual,"signature":h.hexdigest()})
 dataJson3=response3.json
@@ -316,7 +324,7 @@ def actualizar_imagen(request):
         cursor_imagen.execute(query)
         for codigo, imagen in cursor_imagen.fetchall():
             conexion
-            consulta = "UPDATE 	intcomexapp_imagenes SET imagenes = %s WHERE mpn = %s and imagenes='';"
+            consulta = "UPDATE intcomexapp_imagenes SET imagenes = %s WHERE mpn = %s and imagenes='';"
             cursor_imagen1= conexion.cursor()
             cursor_imagen1.execute(consulta, (imagen, codigo))
         conexion.commit()
@@ -325,12 +333,26 @@ def actualizar_imagen(request):
         conexion.close()
         
     return render(request, "IntcomexApp/crud_intcomex.html")
+
+@login_required
+def sin_imagen(request):
+    cursor = conexion.cursor()
+    try:
+        query=("UPDATE intcomexapp_imagenes SET imagenes = %s WHERE imagenes='a';")
+        imagen = " "
+        cursor.execute(query, (imagen))
+        conexion.commit()  
+    finally:
+        conexion.close()
+    
+    return render(request, "IntcomexApp/crud_intcomex.html")
+    
     
 @login_required
 def agregar_j(request):
     try:
         cur = conexion.cursor()
-        cur.execute( "SELECT sku, descripcion, cantidad, categoria, precio, marca, mpn, upc, peso, ancho, altura, largo FROM intcomexapp_producto" )
+        cur.execute( "SELECT sku, descripcion, cantidad, categoria, precio, marca, mpn, upc, peso, ancho, altura, largo FROM intcomexapp_producto as p WHERE NOT EXISTS (SELECT NULL FROM intcomexapp_imagen_jumpseller as i WHERE p.sku= i.sku_imagen)" )
         for sku, descripcion, cantidad, categoria, precio, marca, mpn, upc, peso, ancho, altura, largo in cur.fetchall():
             data = {"product": {
             "name": descripcion,
@@ -381,12 +403,18 @@ def agregar_j(request):
         
     return render(request, "IntcomexApp/crud_intcomex.html")
 
+@login_required
 def agregar_id(request):
     
     login = "04490abd35c41fcab3af6c7e5bd2f63f"
     authtoken = "f34b373f8974c16b5b945fc9a6c0f952"
+    response7 = requests.get("https://api.jumpseller.com/v1/products/count.json?", params = {"login":login,"authtoken":authtoken}, headers= {"Content-Type":"application/json"})
+    dataJson7=response7.json
+    jsonToPython7 = json.loads(response7.content)
+    contar=jsonToPython7['count']
+    total=math.ceil(contar/100)
     limit = 200
-    for page in range(22):
+    for page in range(total):
         response4 = requests.get("https://api.jumpseller.com/v1/products.json?", params = {"login":login,"authtoken":authtoken, "limit":limit, "page":page}, headers= {"Content-Type":"application/json"})
         # Definimos la cabecera y el diccionario con los datos
         dataJson4=response4.json
@@ -430,6 +458,7 @@ def enviar_imagen(request):
 
     return render(request, "IntcomexApp/crud_intcomex.html")
 
+@login_required
 def actualiza_jumpseller(request):
     try:
         cur = conexion.cursor()
@@ -481,8 +510,7 @@ def actualiza_jumpseller(request):
 
     return render(request, "IntcomexApp/crud_intcomex.html")
 
-
-
+@login_required
 def enviar_ordenes(request):
     orden = 'orden' in request.POST
     """
@@ -518,6 +546,7 @@ def enviar_ordenes(request):
       
     return render(request, "IntcomexApp/crud_intcomex.html")
 
+@login_required
 def recuperar_orden(request):
     orden = 'orden' in request.POST
     apikey = "b315098a-260f-4785-b612-a7a504e428d8"
@@ -536,6 +565,7 @@ def recuperar_orden(request):
     
     return render(request, "IntcomexApp/crud_intcomex.html")
 
+@login_required
 def exportar_errores(request):
     outfile = BytesIO()
     sql=('SELECT i.sku, i.upc, i.descripcion, i.cantidad, i.marca, i.peso, i.ancho, i.altura, i.largo, i.mpn, i.categoria, p.imagenes FROM intcomexapp_producto as i LEFT join prueba_imagenes as p on i.sku=p.localSku;')
@@ -548,3 +578,39 @@ def exportar_errores(request):
     
     return response  
 
+@login_required
+def listar_producto(request):
+    productos= producto.objects.all()
+    page = request.GET.get('page', 1)
+    try: 
+        paginator = Paginator(productos, 5)
+        productos = paginator.page(page)
+    except:
+        raise Http404
+    
+    
+    data = {
+        'entity': productos,
+        'paginator': paginator
+    }
+    
+    return render(request, "IntcomexApp/listar.html", data)
+
+@login_required
+def modificar_producto(request, sku):
+    
+    Producto = get_object_or_404(producto, sku=sku)
+    
+    data = {
+        'form': ProductoForm(instance=Producto)
+    }
+    
+    if request.method == 'POST':
+        formulario = ProductoForm(data=request.POST, instance=Producto, files=request.FILES)
+        if formulario.is_valid():
+            formulario.save()
+            messages.success(request, "modificado correctamente")
+            return redirect(to="listar_producto")
+        data["form"] = formulario
+    
+    return render(request, "IntcomexApp/modificar.html", data)
